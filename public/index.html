@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎮 پنل مدیریت ماینکرفت</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f1923;--bg2:#1a2634;--bg3:#243447;--text:#e4e6eb;--text2:#b0b3b8;--primary:#00b4d8;--primary2:#0096c7;--green:#2ecc71;--red:#e74c3c;--yellow:#f1c40f;--orange:#e67e22;--purple:#9b59b6;--border:#2d3e50;--sidebar:260px;--radius:12px;--shadow:0 4px 20px rgba(0,0,0,.3)}
+.light{--bg:#f0f2f5;--bg2:#ffffff;--bg3:#e4e6eb;--text:#1c1e21;--text2:#606770;--border:#dadde1;--shadow:0 4px 20px rgba(0,0,0,.1)}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:all .3s}
+a{color:var(--primary);text-decoration:none}
+/* LOGIN */
+#loginPage{display:flex;justify-content:center;align-items:center;min-height:100vh;background:linear-gradient(135deg,#0f1923,#1a2634,#243447)}
+.login-box{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:40px;width:400px;box-shadow:var(--shadow)}
+.login-box h1{text-align:center;margin-bottom:30px;font-size:28px}
+.login-box h1 span{font-size:60px;display:block;margin-bottom:10px}
+.login-box input{width:100%;padding:14px 18px;margin-bottom:16px;border:2px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font-size:15px;direction:rtl;transition:border .3s}
+.login-box input:focus{border-color:var(--primary);outline:none}
+.btn{padding:12px 24px;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;transition:all .3s;display:inline-flex;align-items:center;gap:8px}
+.btn-primary{background:var(--primary);color:#fff;width:100%;justify-content:center}
+.btn-primary:hover{background:var(--primary2);transform:translateY(-2px)}
+.btn-green{background:var(--green);color:#fff}
+.btn-red{background:var(--red);color:#fff}
+.btn-yellow{background:var(--yellow);color:#000}
+.btn-purple{background:var(--purple);color:#fff}
+.btn-sm{padding:8px 16px;font-size:13px}
+.btn-icon{width:36px;height:36px;padding:0;justify-content:center;border-radius:8px}
+/* LAYOUT */
+#app{display:none}
+.sidebar{position:fixed;right:0;top:0;bottom:0;width:var(--sidebar);background:var(--bg2);border-left:1px solid var(--border);display:flex;flex-direction:column;z-index:100;transition:transform .3s}
+.sidebar-header{padding:20px;text-align:center;border-bottom:1px solid var(--border)}
+.sidebar-header h2{font-size:18px;color:var(--primary)}
+.sidebar-header small{color:var(--text2);font-size:12px}
+.sidebar-nav{flex:1;overflow-y:auto;padding:10px}
+.nav-item{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:10px;cursor:pointer;transition:all .2s;color:var(--text2);margin-bottom:4px;font-size:14px}
+.nav-item:hover,.nav-item.active{background:var(--bg3);color:var(--primary)}
+.nav-item.active{border-right:3px solid var(--primary)}
+.nav-item i{font-size:18px;width:24px;text-align:center}
+.sidebar-footer{padding:16px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:center}
+.main{margin-right:var(--sidebar);padding:24px;min-height:100vh}
+.page{display:none}
+.page.active{display:block}
+/* CARDS */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:24px}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);transition:transform .2s}
+.stat-card:hover{transform:translateY(-3px)}
+.stat-card .icon{font-size:28px;margin-bottom:8px}
+.stat-card .value{font-size:28px;font-weight:700}
+.stat-card .label{color:var(--text2);font-size:13px;margin-top:4px}
+.stat-card .bar{height:6px;background:var(--bg3);border-radius:3px;margin-top:10px;overflow:hidden}
+.stat-card .bar-fill{height:100%;border-radius:3px;transition:width .5s}
+/* PANELS */
+.panel{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px;box-shadow:var(--shadow)}
+.panel-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.panel-header h3{font-size:16px;display:flex;align-items:center;gap:8px}
+/* TABLE */
+table{width:100%;border-collapse:collapse}
+th,td{padding:12px 16px;text-align:right;border-bottom:1px solid var(--border);font-size:14px}
+th{color:var(--text2);font-weight:600;font-size:13px}
+tr:hover{background:var(--bg3)}
+/* CONSOLE */
+.console{background:#0a0e14;border-radius:10px;padding:16px;font-family:'Cascadia Code','Fira Code',monospace;font-size:13px;max-height:500px;overflow-y:auto;direction:ltr;text-align:left;line-height:1.6}
+.console .log-line{color:#8b949e}.console .log-line.error{color:#f85149}.console .log-line.warn{color:#d29922}.console .log-line.info{color:#58a6ff}.console .log-line.cmd{color:#7ee787}
+.console-input{display:flex;gap:8px;margin-top:12px}
+.console-input input{flex:1;background:#0d1117;border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:#58a6ff;font-family:monospace;font-size:13px;direction:ltr}
+/* FORM */
+.form-group{margin-bottom:16px}
+.form-group label{display:block;margin-bottom:6px;font-size:13px;color:var(--text2);font-weight:600}
+.form-input{width:100%;padding:12px 16px;border:2px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font-size:14px;transition:border .3s}
+.form-input:focus{border-color:var(--primary);outline:none}
+select.form-input{cursor:pointer}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+/* BADGE */
+.badge{display:inline-block;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-green{background:rgba(46,204,113,.2);color:var(--green)}
+.badge-red{background:rgba(231,76,60,.2);color:var(--red)}
+.badge-yellow{background:rgba(241,196,15,.2);color:var(--yellow)}
+.badge-blue{background:rgba(0,180,216,.2);color:var(--primary)}
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000;justify-content:center;align-items:center}
+.modal-overlay.show{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:28px;width:500px;max-width:90vw;max-height:80vh;overflow-y:auto;box-shadow:var(--shadow)}
+.modal h3{margin-bottom:20px;font-size:18px}
+/* FILE MANAGER */
+.file-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:8px;cursor:pointer;transition:background .2s;border-bottom:1px solid var(--border)}
+.file-item:hover{background:var(--bg3)}
+.file-item .file-icon{font-size:20px;width:30px;text-align:center}
+.file-item .file-name{flex:1;font-size:14px}
+.file-item .file-size{color:var(--text2);font-size:12px}
+.file-item .file-actions{display:flex;gap:4px}
+.breadcrumb{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.breadcrumb span{cursor:pointer;color:var(--primary);font-size:13px}
+.breadcrumb span:hover{text-decoration:underline}
+/* SERVER CARD */
+.server-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;transition:all .2s}
+.server-card:hover{border-color:var(--primary)}
+.server-card .server-info h4{margin-bottom:4px}
+.server-card .server-meta{display:flex;gap:16px;font-size:13px;color:var(--text2)}
+.server-card .server-actions{display:flex;gap:8px}
+/* TOAST */
+.toast-container{position:fixed;top:20px;left:20px;z-index:9999;display:flex;flex-direction:column;gap:8px}
+.toast{padding:14px 20px;border-radius:10px;color:#fff;font-size:14px;animation:slideIn .3s ease;min-width:280px;display:flex;align-items:center;gap:10px}
+.toast-success{background:#2ecc71}.toast-error{background:#e74c3c}.toast-info{background:#3498db}.toast-warning{background:#f39c12}
+@keyframes slideIn{from{transform:translateX(-100%);opacity:0}to{transform:translateX(0);opacity:1}}
+/* RESPONSIVE */
+@media(max-width:768px){.sidebar{transform:translateX(100%)}.sidebar.open{transform:translateX(0)}.main{margin-right:0}.form-row{grid-template-columns:1fr}.stats-grid{grid-template-columns:1fr 1fr}}
+/* TABS */
+.tabs{display:flex;gap:4px;margin-bottom:16px;border-bottom:2px solid var(--border);padding-bottom:0}
+.tab{padding:10px 20px;cursor:pointer;color:var(--text2);font-size:14px;font-weight:600;border-bottom:3px solid transparent;transition:all .2s;margin-bottom:-2px}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--primary);border-bottom-color:var(--primary)}
+.tab-content{display:none}.tab-content.active{display:block}
+/* GRAPHS */
+.graph-container{height:200px;display:flex;align-items:flex-end;gap:4px;padding:10px 0}
+.graph-bar{flex:1;background:var(--primary);border-radius:4px 4px 0 0;transition:height .5s;min-height:4px;position:relative}
+.graph-bar:hover{opacity:.8}
+.graph-bar::after{content:attr(data-value);position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--text2);white-space:nowrap}
+/* SEARCH */
+.search-box{position:relative}
+.search-box input{padding-right:40px}
+.search-box::after{content:'🔍';position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:14px}
+/* GRID */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+@media(max-width:768px){.grid-2,.grid-3{grid-template-columns:1fr}}
+/* SCROLL */
+::-webkit-scrollbar{width:8px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:var(--text2)}
+</style>
+</head>
+<body>
+
+<!-- LOGIN PAGE -->
+<div id="loginPage">
+<div class="login-box">
+<span style="font-size:60px;display:block;text-align:center;margin-bottom:10px">🎮</span>
+<h1>پنل ماینکرفت</h1>
+<input type="text" id="loginUser" placeholder="نام کاربری" autocomplete="username">
+<input type="password" id="loginPass" placeholder="رمز عبور" autocomplete="current-password">
+<button class="btn btn-primary" onclick="doLogin()">ورود</button>
+<div id="loginError" style="color:var(--red);text-align:center;margin-top:12px;font-size:13px"></div>
+</div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app">
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+<div class="sidebar-header">
+<h2>🎮 پنل ماینکرفت</h2>
+<small id="currentUser">admin</small>
+</div>
+<div class="sidebar-nav">
+<div class="nav-item active" onclick="showPage('dashboard')" data-page="dashboard"><i>📊</i> داشبورد</div>
+<div class="nav-item" onclick="showPage('servers')" data-page="servers"><i>🖥️</i> سرورها</div>
+<div class="nav-item" onclick="showPage('console')" data-page="console"><i>💻</i> کنسول</div>
+<div class="nav-item" onclick="showPage('players')" data-page="players"><i>👥</i> بازیکنان</div>
+<div class="nav-item" onclick="showPage('files')" data-page="files"><i>📁</i> فایل منیجر</div>
+<div class="nav-item" onclick="showPage('install')" data-page="install"><i>🧩</i> نصب ماینکرفت</div>
+<div class="nav-item" onclick="showPage('plugins')" data-page="plugins"><i>🔌</i> پلاگین‌ها</div>
+<div class="nav-item" onclick="showPage('worlds')" data-page="worlds"><i>🌍</i> ورلدها</div>
+<div class="nav-item" onclick="showPage('backups')" data-page="backups"><i>💾</i> بکاپ</div>
+<div class="nav-item" onclick="showPage('schedules')" data-page="schedules"><i>⏰</i> زمان‌بندی</div>
+<div class="nav-item" onclick="showPage('settings')" data-page="settings"><i>⚙️</i> تنظیمات سرور</div>
+<div class="nav-item" onclick="showPage('network')" data-page="network"><i>🌐</i> شبکه و پورت</div>
+<div class="nav-item" onclick="showPage('users')" data-page="users"><i>👤</i> کاربران</div>
+<div class="nav-item" onclick="showPage('system')" data-page="system"><i>🖥️</i> سیستم</div>
+</div>
+<div class="sidebar-footer">
+<button class="btn btn-icon" onclick="toggleTheme()" title="تم">🌙</button>
+<button class="btn btn-icon" onclick="doLogout()" title="خروج">🚪</button>
+</div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main">
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toasts"></div>
+
+<!-- ===== DASHBOARD ===== -->
+<div class="page active" id="page-dashboard">
+<h2 style="margin-bottom:20px">📊 داشبورد</h2>
+<div class="stats-grid" id="dashStats"></div>
+<div class="grid-2">
+<div class="panel">
+<div class="panel-header"><h3>📈 مصرف CPU</h3></div>
+<div class="graph-container" id="cpuGraph"></div>
+</div>
+<div class="panel">
+<div class="panel-header"><h3>📈 مصرف RAM</h3></div>
+<div class="graph-container" id="ramGraph"></div>
+</div>
+</div>
+<div class="panel">
+<div class="panel-header"><h3>🖥️ سرورها</h3></div>
+<div id="dashServers"></div>
+</div>
+</div>
+
+<!-- ===== SERVERS ===== -->
+<div class="page" id="page-servers">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+<h2>🖥️ مدیریت سرورها</h2>
+<button class="btn btn-primary" onclick="showModal('createServer')">➕ سرور جدید</button>
+</div>
+<div id="serversList"></div>
+</div>
+
+<!-- ===== CONSOLE ===== -->
+<div class="page" id="page-console">
+<h2 style="margin-bottom:20px">💻 کنسول سرور</h2>
+<div class="form-group">
+<select class="form-input" id="consoleServerSelect" onchange="switchConsole()">
+<option value="">انتخاب سرور...</option>
+</select>
+</div>
+<div class="panel">
+<div class="console" id="consoleOutput"></div>
+<div class="console-input">
+<input type="text" id="consoleInput" placeholder="دستور را وارد کنید..." onkeydown="if(event.key==='Enter')sendCmd()">
+<button class="btn btn-primary" onclick="sendCmd()">ارسال</button>
+</div>
+</div>
+<div style="display:flex;gap:8px;margin-top:12px">
+<button class="btn btn-green btn-sm" onclick="serverAction('start')">▶️ استارت</button>
+<button class="btn btn-red btn-sm" onclick="serverAction('stop')">⏹️ استاپ</button>
+<button class="btn btn-yellow btn-sm" onclick="serverAction('restart')">🔄 ری‌استارت</button>
+<button class="btn btn-red btn-sm" onclick="serverAction('kill')">💀 کیل</button>
+</div>
+</div>
+
+<!-- ===== PLAYERS ===== -->
+<div class="page" id="page-players">
+<h2 style="margin-bottom:20px">👥 مدیریت بازیکنان</h2>
+<div class="form-group">
+<select class="form-input" id="playerServerSelect" onchange="loadPlayers()">
+<option value="">انتخاب سرور...</option>
+</select>
+</div>
+<div class="grid-2">
+<div class="panel">
+<div class="panel-header"><h3>🟢 بازیکنان آنلاین</h3></div>
+<div id="onlinePlayers"></div>
+</div>
+<div class="panel">
+<div class="panel-header"><h3>🎮 اعمال روی بازیکن</h3></div>
+<div class="form-group"><label>نام بازیکن</label><input class="form-input" id="playerName" placeholder="نام بازیکن"></div>
+<div style="display:flex;flex-wrap:wrap;gap:8px">
+<button class="btn btn-red btn-sm" onclick="playerAction('kick')">کیک</button>
+<button class="btn btn-red btn-sm" onclick="playerAction('ban')">بن</button>
+<button class="btn btn-green btn-sm" onclick="playerAction('unban')">آنبن</button>
+<button class="btn btn-yellow btn-sm" onclick="playerAction('op')">OP</button>
+<button class="btn btn-yellow btn-sm" onclick="playerAction('deop')">DeOP</button>
+<button class="btn btn-blue btn-sm" onclick="playerAction('whitelist/add')">وایت‌لیست+</button>
+<button class="btn btn-blue btn-sm" onclick="playerAction('whitelist/remove')">وایت‌لیست-</button>
+</div>
+<div class="form-group" style="margin-top:16px"><label>IP برای بن</label><input class="form-input" id="playerIP" placeholder="IP Address"></div>
+<div style="display:flex;gap:8px">
+<button class="btn btn-red btn-sm" onclick="playerAction('ban-ip')">بن IP</button>
+<button class="btn btn-green btn-sm" onclick="playerAction('unban-ip')">آنبن IP</button>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ===== FILE MANAGER ===== -->
+<div class="page" id="page-files">
+<h2 style="margin-bottom:20px">📁 فایل منیجر</h2>
+<div class="form-group">
+<select class="form-input" id="fileServerSelect" onchange="loadFiles('')">
+<option value="">انتخاب سرور...</option>
+</select>
+</div>
+<div class="panel">
+<div class="panel-header">
+<h3>📂 فایل‌ها</h3>
+<div style="display:flex;gap:8px">
+<button class="btn btn-primary btn-sm" onclick="showModal('uploadFile')">📤 آپلود</button>
+<button class="btn btn-green btn-sm" onclick="createNewFolder()">📁 پوشه جدید</button>
+<button class="btn btn-yellow btn-sm" onclick="createNewFile()">📄 فایل جدید</button>
+</div>
+</div>
+<div class="breadcrumb" id="fileBreadcrumb"></div>
+<div id="fileList"></div>
+</div>
+</div>
+
+<!-- ===== INSTALL ===== -->
+<div class="page" id="page-install">
+<h2 style="margin-bottom:20px">🧩 نصب ماینکرفت</h2>
+<div class="panel">
+<div class="panel-header"><h3>نصب سرور ماینکرفت</h3></div>
+<div class="form-row">
+<div class="form-group">
+<label>سرور</label>
+<select class="form-input" id="installServer">
+<option value="">انتخاب سرور...</option>
+</select>
+</div>
+<div class="form-group">
+<label>نوع سرور</label>
+<select class="form-input" id="installType">
+<option value="paper">Paper</option>
+<option value="purpur">Purpur</option>
+<option value="vanilla">Vanilla</option>
+<option value="fabric">Fabric</option>
+</select>
+</div>
+</div>
+<div class="form-group">
+<label>نسخه</label>
+<select class="form-input" id="installVersion">
+<option value="1.21.4">1.21.4</option>
+<option value="1.21.3">1.21.3</option>
+<option value="1.21.2">1.21.2</option>
+<option value="1.21.1">1.21.1</option>
+<option value="1.20.6">1.20.6</option>
+<option value="1.20.4">1.20.4</option>
+<option value="1.20.2">1.20.2</option>
+<option value="1.20.1">1.20.1</option>
+<option value="1.19.4">1.19.4</option>
+<option value="1.19.2">1.19.2</option>
+<option value="1.18.2">1.18.2</option>
+<option value="1.16.5">1.16.5</option>
+</select>
+</div>
+<button class="btn btn-primary" onclick="installMinecraft()" style="margin-top:8px">🚀 نصب</button>
+<div id="installStatus" style="margin-top:16px"></div>
+</div>
+</div>
+
+<!-- ===== PLUGINS ===== -->
+<div class="page" id="page-plugins">
+<h2 style="margin-bottom:20px">🔌 مدیریت پلاگین‌ها</h2>
+<div class="form-group">
+<select class="form-input" id="pluginServerSelect" onchange="loadPlugins()">
+<option value="">انتخاب سرور...</option>
+</select>
+</div>
+<div class="panel">
+<div class="panel-header">
+<h3>پلاگین‌ها</h3>
+<button class="btn btn-primary btn-sm" onclick="document.getElementById('pluginUpload').click()">📤 آپلود پلاگین</button>
+<input type="file" id="pluginUpload" accept=".jar" style="display:none" onchange="uploadPlugin(this)">
+</div>
+<div id="pluginList"></div>
+</div>
+</div>
+
+<!-- ===== WORLDS ===== -->
+<div class="page" id="page-worlds">
+<h2 style="margin-bottom:20px">🌍 مدیریت ورلدها</h2>
+<div class="form-group">
+<select class="form-input" id="worldServerSelect" onchange="loadWorlds()">
+<option value="">انتخاب سرور...</option>
+</select>
+</div>
+<div class="panel">
+<div class="panel-header">
+<h3>ورلدها</h3>
+<div style="display:flex;gap:8px">
+<button class="btn btn-primary btn-sm" onclick="document.getElementById('worldUpload').click()">📤 آپلود ورلد</button>
+<input type="file" id="worldUpload" accept=".zip" style="display:none" onchange="uploadWorld(this)">
+</div>
+</div>
+<div id="worldList"></div>
+</div>
+</div>
+
+<!-- ===== BACKUPS ===== -->
+<div class="page" id="page-backups">
+<h2 style="margin-bottom:20px">💾 مدیریت بکاپ</h2>
+<div class="form-group">
+<select class="form-input" id="backupServerSelect" onchange="loadBackups()">
+<option value="">انتخاب سرور...</option>
+</select>
+</div>
+<div class="panel">
+<div class="panel-header">
+<h3>بکاپ‌ها</h3>
+<button class="btn btn-green btn-sm" onclick="createBackup()">➕ بکاپ جدید</button>
+</div>
+<div id="backupList"></div>
+</div>
+</div>
+
+<!-- ===== SCHEDULES ===== -->
+<div class="page" id="page-schedules">
+<h2 style="margin-bottom:20px">⏰ زمان‌بندی</h2>
+<div class="form-group">
+<select class="form-input" id="scheduleServerSelect" onchange="loadSchedules()">
+<option value="">انتخاب سرور...</option>
+</select>
+</div>
+<div class="panel">
+<div class="panel-header">
+<h3>تسک‌ها</h3>
+<button class="btn btn-primary btn-sm" onclick="showModal('createSchedule')">➕ تسک جدید</button>
+</div>
+<div id="scheduleList"></div>
+</div>
+</div>
+
+<!-- ===== SETTINGS ===== -->
+<div class="page" id="page-settings">
+<h2 style="margin-bottom:20px">⚙️ تنظیمات سرور</h2>
+<div class="form-group">
+<select class="form-input" id="settingsServerSelect" onchange="loadSettings()">
+<option value="">انتخاب سرور...</option>
+</select>
+</div>
+<div class="panel">
+<div class="panel-header"><h3>server.properties</h3></div>
+<div id="settingsForm"></div>
+<button class="btn btn-primary" onclick="saveSettings()" style="margin-top:16px">💾 ذخیره تنظیمات</button>
+</div>
+<div class="panel" style="margin-top:16px">
+<div class="panel-header"><h3>⚙️ تنظیمات سرور (پنل)</h3></div>
+<div class="form-row">
+<div class="form-group"><label>نام سرور</label><input class="form-input" id="cfgName"></div>
+<div class="form-group"><label>پورت</label><input class="form-input" id="cfgPort" type="number"></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label>RAM (مثال: 2G)</label><input class="form-input" id="cfgMaxRam"></div>
+<div class="form-group"><label>حداقل RAM</label><input class="form-input" id="cfgMinRam"></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label>حداکثر بازیکن</label><input class="form-input" id="cfgMaxPlayers" type="number"></div>
+<div class="form-group"><label>مسیر Java</label><input class="form-input" id="cfgJavaPath"></div>
+</div>
+<div class="form-group"><label>JVM Arguments</label><input class="form-input" id="cfgJvmArgs"></div>
+<div class="form-group">
+<label>Auto Restart</label>
+<select class="form-input" id="cfgAutoRestart"><option value="false">غیرفعال</option><option value="true">فعال</option></select>
+</div>
+<button class="btn btn-primary" onclick="saveServerConfig()">💾 ذخیره</button>
+</div>
+</div>
+
+<!-- ===== NETWORK ===== -->
+<div class="page" id="page-network">
+<h2 style="margin-bottom:20px">🌐 شبکه و پورت</h2>
+<div class="panel">
+<div class="panel-header"><h3>اطلاعات شبکه</h3></div>
+<div id="networkInfo"></div>
+</div>
+</div>
+
+<!-- ===== USERS ===== -->
+<div class="page" id="page-users">
+<h2 style="margin-bottom:20px">👤 مدیریت کاربران</h2>
+<div class="panel">
+<div class="panel-header">
+<h3>کاربران</h3>
+<button class="btn btn-primary btn-sm" onclick="showModal('createUser')">➕ کاربر جدید</button>
+</div>
+<div id="usersList"></div>
+</div>
+</div>
+
+<!-- ===== SYSTEM ===== -->
+<div class="page" id="page-system">
+<h2 style="margin-bottom:20px">🖥️ اطلاعات سیستم</h2>
+<div class="stats-grid" id="systemStats"></div>
+<div class="panel">
+<div class="panel-header"><h3>☕ Java</h3></div>
+<div id="javaInfo"></div>
+</div>
+<div class="panel" style="margin-top:16px">
+<div class="panel-header"><h3>🗄️ دیتابیس</h3></div>
+<div id="dbInfo"></div>
+</div>
+</div>
+
+</div><!-- /main -->
+</div><!-- /app -->
+
+<!-- MODALS -->
+<div class="modal-overlay" id="modal-createServer">
+<div class="modal">
+<h3>➕ سرور جدید</h3>
+<div class="form-group"><label>نام سرور</label><input class="form-input" id="newServerName" placeholder="سرور من"></div>
+<div class="form-row">
+<div class="form-group"><label>پورت</label><input class="form-input" id="newServerPort" type="number" value="25565"></div>
+<div class="form-group"><label>حداکثر بازیکن</label><input class="form-input" id="newServerMaxPlayers" type="number" value="20"></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label>حداکثر RAM</label><input class="form-input" id="newServerMaxRam" value="2G"></div>
+<div class="form-group"><label>حداقل RAM</label><input class="form-input" id="newServerMinRam" value="1G"></div>
+</div>
+<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:20px">
+<button class="btn" onclick="hideModals()">انصراف</button>
+<button class="btn btn-primary" onclick="createServer()">ایجاد</button>
+</div>
+</div>
+</div>
+
+<div class="modal-overlay" id="modal-createUser">
+<div class="modal">
+<h3>➕ کاربر جدید</h3>
+<div class="form-group"><label>نام کاربری</label><input class="form-input" id="newUsername"></div>
+<div class="form-group"><label>رمز عبور</label><input class="form-input" id="newUserPass" type="password"></div>
+<div class="form-group"><label>ایمیل</label><input class="form-input" id="newUserEmail" type="email"></div>
+<div class="form-group"><label>نقش</label><select class="form-input" id="newUserRole"><option value="user">کاربر</option><option value="admin">ادمین</option></select></div>
+<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:20px">
+<button class="btn" onclick="hideModals()">انصراف</button>
+<button class="btn btn-primary" onclick="createUser()">ایجاد</button>
+</div>
+</div>
+</div>
+
+<div class="modal-overlay" id="modal-createSchedule">
+<div class="modal">
+<h3>➕ تسک جدید</h3>
+<div class="form-group"><label>نام تسک</label><input class="form-input" id="schedName"></div>
+<div class="form-group"><label>عملیات</label><select class="form-input" id="schedAction"><option value="start">استارت</option><option value="stop">استاپ</option><option value="restart">ری‌استارت</option><option value="command">دستور</option></select></div>
+<div class="form-group"><label>Cron (مثال: 0 */6 * * *)</label><input class="form-input" id="schedCron" placeholder="0 */6 * * *"></div>
+<div class="form-group"><label>دستور (در صورت انتخاب)</label><input class="form-input" id="schedCommand"></div>
+<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:20px">
+<button class="btn" onclick="hideModals()">انصراف</button>
+<button class="btn btn-primary" onclick="createSchedule()">ایجاد</button>
+</div>
+</div>
+</div>
+
+<div class="modal-overlay" id="modal-uploadFile">
+<div class="modal">
+<h3>📤 آپلود فایل</h3>
+<input type="file" id="fileUploadInput" multiple style="margin:20px 0">
+<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:20px">
+<button class="btn" onclick="hideModals()">انصراف</button>
+<button class="btn btn-primary" onclick="doUploadFile()">آپلود</button>
+</div>
+</div>
+</div>
+
+<div class="modal-overlay" id="modal-editFile">
+<div class="modal" style="width:800px;max-width:95vw">
+<h3>✏️ ویرایش فایل: <span id="editFileName"></span></h3>
+<textarea id="editFileContent" style="width:100%;height:400px;background:var(--bg);color:var(--text);border:2px solid var(--border);border-radius:10px;padding:16px;font-family:monospace;font-size:13px;resize:vertical;direction:ltr"></textarea>
+<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
+<button class="btn" onclick="hideModals()">انصراف</button>
+<button class="btn btn-primary" onclick="saveFileEdit()">💾 ذخیره</button>
+</div>
+</div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+const API = '';
+let token = localStorage.getItem('mc_token');
+let currentUser = null;
+let servers = [];
+let currentServerId = null;
+let currentFilePath = '';
+let editFilePath = '';
+const cpuHistory = Array(30).fill(0);
+const ramHistory = Array(30).fill(0);
+
+// ── Socket.IO ──────────────────────────────────────────────
+const socket = io();
+
+// ── Auth ───────────────────────────────────────────────────
+async function api(url, opts = {}) {
+    const headers = { 'Content-Type': 'application/json', ...(opts.headers || {}) };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    const res = await fetch(API + url, { ...opts, headers });
+    if (res.status === 401) { doLogout(); return null; }
+    return res.json();
+}
+
+async function doLogin() {
+    const u = document.getElementById('loginUser').value;
+    const p = document.getElementById('loginPass').value;
+    const data = await api('/api/auth/login', { method: 'POST', body: JSON.stringify({ username: u, password: p }) });
+    if (data?.token) {
+        token = data.token;
+        currentUser = data.user;
+        localStorage.setItem('mc_token', token);
+        document.getElementById('loginPage').style.display = 'none';
+        document.getElementById('app').style.display = 'block';
+        document.getElementById('currentUser').textContent = currentUser.username;
+        initApp();
+    } else {
+        document.getElementById('loginError').textContent = data?.error || 'خطا در ورود';
+    }
+}
+
+function doLogout() {
+    token = null; currentUser = null;
+    localStorage.removeItem('mc_token');
+    document.getElementById('loginPage').style.display = 'flex';
+    document.getElementById('app').style.display = 'none';
+}
+
+// ── Init ───────────────────────────────────────────────────
+async function initApp() {
+    await loadServers();
+    loadSystemData();
+    setInterval(loadSystemData, 5000);
+
+    socket.on('stats', data => {
+        cpuHistory.push(parseFloat(data.cpu.load[0] / data.cpu.cores * 100).toFixed(1));
+        cpuHistory.shift();
+        ramHistory.push(parseFloat(data.ram.percent));
+        ramHistory.shift();
+        updateDashboard(data);
+    });
+}
+
+async function loadServers() {
+    servers = await api('/api/servers') || [];
+    populateServerSelects();
+    renderServers();
+    renderDashServers();
+}
+
+function populateServerSelects() {
+    const opts = servers.map(s => `<option value="${s.id}">${s.name} (${s.id})</option>`).join('');
+    ['consoleServerSelect','playerServerSelect','fileServerSelect','pluginServerSelect','worldServerSelect','backupServerSelect','scheduleServerSelect','settingsServerSelect','installServer'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = '<option value="">انتخاب سرور...</option>' + opts;
+    });
+}
+
+// ── Pages ──────────────────────────────────────────────────
+function showPage(name) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('page-' + name)?.classList.add('active');
+    document.querySelector(`.nav-item[data-page="${name}"]`)?.classList.add('active');
+
+    if (name === 'servers') loadServers();
+    if (name === 'users') loadUsers();
+    if (name === 'system') loadSystemPage();
+    if (name === 'network') loadNetwork();
+}
+
+// ── Dashboard ──────────────────────────────────────────────
+function updateDashboard(data) {
+    const serverListHtml = servers.map(s => {
+        const statusBadge = s.status === 'online' ? '<span class="badge badge-green">آنلاین</span>' : '<span class="badge badge-red">آفلاین</span>';
+        return `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px;border-bottom:1px solid var(--border)">
+            <div><strong>${s.name}</strong> ${statusBadge}</div>
+            <div style="color:var(--text2);font-size:13px">👥 ${s.playerCount || 0}/${s.maxPlayers || 20} | 🔌 :${s.port || 25565}</div>
+        </div>`;
+    }).join('');
+
+    document.getElementById('dashStats').innerHTML = `
+        <div class="stat-card"><div class="icon">🖥️</div><div class="value">${servers.length}</div><div class="label">سرورها</div></div>
+        <div class="stat-card"><div class="icon">⚡</div><div class="value">${data.cpu.load[0].toFixed(2)}</div><div class="label">CPU Load</div>
+            <div class="bar"><div class="bar-fill" style="width:${(data.cpu.load[0]/data.cpu.cores*100).toFixed(0)}%;background:var(--primary)"></div></div>
+        </div>
+        <div class="stat-card"><div class="icon">💾</div><div class="value">${(data.ram.used/1073741824).toFixed(1)}GB</div><div class="label">RAM (${data.ram.percent}%)</div>
+            <div class="bar"><div class="bar-fill" style="width:${data.ram.percent}%;background:var(--green)"></div></div>
+        </div>
+        <div class="stat-card"><div class="icon">👥</div><div class="value">${servers.reduce((a,s) => a+(s.playerCount||0), 0)}</div><div class="label">بازیکنان آنلاین</div></div>
+        <div class="stat-card"><div class="icon">⏱️</div><div class="value">${formatUptime(data.uptime)}</div><div class="label">آپتایم سیستم</div></div>
+    `;
+    document.getElementById('dashServers').innerHTML = serverListHtml || '<div style="padding:20px;text-align:center;color:var(--text2)">سروری یافت نشد</div>';
+
+    // Graphs
+    renderGraph('cpuGraph', cpuHistory, 'var(--primary)');
+    renderGraph('ramGraph', ramHistory, 'var(--green)');
+}
+
+function renderGraph(containerId, data, color) {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    const max = Math.max(...data, 1);
+    el.innerHTML = data.map((v, i) => `<div class="graph-bar" style="height:${(v/max*100).toFixed(0)}%;background:${color}" data-value="${v}%"></div>`).join('');
+}
+
+function renderDashServers() {
+    const el = document.getElementById('dashServers');
+    if (!el) return;
+    const serverListHtml = servers.map(s => {
+        const statusBadge = s.status === 'online' ? '<span class="badge badge-green">آنلاین</span>' : '<span class="badge badge-red">آفلاین</span>';
+        return `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px;border-bottom:1px solid var(--border)">
+            <div><strong>${s.name}</strong> ${statusBadge}</div>
+            <div style="color:var(--text2);font-size:13px">👥 ${s.playerCount||0}/${s.maxPlayers||20} | 🔌 :${s.port||25565}</div>
+        </div>`;
+    }).join('');
+    el.innerHTML = serverListHtml || '<div style="padding:20px;text-align:center;color:var(--text2)">سروری یافت نشد</div>';
+}
+
+function formatUptime(s) {
+    const d = Math.floor(s/86400), h = Math.floor((s%86400)/3600), m = Math.floor((s%3600)/60);
+    return d > 0 ? `${d}d ${h}h` : h > 0 ? `${h}h ${m}m` : `${m}m`;
+}
+
+// ── Servers ────────────────────────────────────────────────
+function renderServers() {
+    const el = document.getElementById('serversList');
+    if (!el) return;
+    el.innerHTML = servers.map(s => {
+        const statusColor = s.status === 'online' ? 'var(--green)' : 'var(--red)';
+        const statusText = s.status === 'online' ? 'آنلاین' : s.status === 'starting' ? 'در حال استارت...' : 'آفلاین';
+        return `<div class="server-card">
+            <div class="server-info">
+                <h4>${s.name} <span style="color:${statusColor};font-size:12px">● ${statusText}</span></h4>
+                <div class="server-meta">
+                    <span>👥 ${s.playerCount||0}/${s.maxPlayers||20}</span>
+                    <span>🔌 :${s.port||25565}</span>
+                    <span>💾 ${s.maxRam||'2G'}</span>
+                    <span>⏱️ ${s.uptime ? formatUptime(s.uptime/1000) : '-'}</span>
+                </div>
+            </div>
+            <div class="server-actions">
+                <button class="btn btn-green btn-sm" onclick="doServerAction('${s.id}','start')">▶️</button>
+                <button class="btn btn-red btn-sm" onclick="doServerAction('${s.id}','stop')">⏹️</button>
+                <button class="btn btn-yellow btn-sm" onclick="doServerAction('${s.id}','restart')">🔄</button>
+                <button class="btn btn-sm" onclick="selectServerConsole('${s.id}')">💻</button>
+                <button class="btn btn-sm" onclick="deleteServer('${s.id}')">🗑️</button>
+            </div>
+        </div>`;
+    }).join('') || '<div style="padding:40px;text-align:center;color:var(--text2)">سروری ندارید. روی "سرور جدید" کلیک کنید.</div>';
+}
+
+async function createServer() {
+    const data = await api('/api/servers', { method: 'POST', body: JSON.stringify({
+        name: document.getElementById('newServerName').value,
+        port: parseInt(document.getElementById('newServerPort').value) || 25565,
+        maxPlayers: parseInt(document.getElementById('newServerMaxPlayers').value) || 20,
+        maxRam: document.getElementById('newServerMaxRam').value || '2G',
+        minRam: document.getElementById('newServerMinRam').value || '1G'
+    })});
+    if (data?.success) { toast('سرور ساخته شد!', 'success'); hideModals(); loadServers(); }
+    else toast(data?.error || 'خطا', 'error');
+}
+
+async function deleteServer(id) {
+    if (!confirm('آیا مطمئنید؟')) return;
+    await api(`/api/servers/${id}`, { method: 'DELETE' });
+    toast('سرور حذف شد', 'success');
+    loadServers();
+}
+
+async function doServerAction(id, action) {
+    const res = await api(`/api/servers/${id}/${action}`, { method: 'POST' });
+    toast(res?.success ? `${action} انجام شد` : 'خطا', res?.success ? 'success' : 'error');
+    setTimeout(loadServers, 2000);
+}
+
+function selectServerConsole(id) {
+    currentServerId = id;
+    document.getElementById('consoleServerSelect').value = id;
+    showPage('console');
+    switchConsole();
+}
+
+// ── Console ────────────────────────────────────────────────
+function switchConsole() {
+    const id = document.getElementById('consoleServerSelect').value;
+    if (!id) return;
+    currentServerId = id;
+    socket.emit('subscribeConsole', id);
+    document.getElementById('consoleOutput').innerHTML = '';
+
+    socket.off('console:' + id);
+    socket.on('console:' + id, logs => {
+        const el = document.getElementById('consoleOutput');
+        el.innerHTML = logs.map(l => {
+            let cls = 'log-line';
+            const t = l.text.toLowerCase();
+            if (t.includes('error') || t.includes('exception') || t.includes('failed')) cls += ' error';
+            else if (t.includes('warn')) cls += ' warn';
+            else if (t.includes('info') || t.includes('done')) cls += ' info';
+            else if (t.includes('[cmd]')) cls += ' cmd';
+            return `<div class="${cls}">${escapeHtml(l.text)}</div>`;
+        }).join('');
+        el.scrollTop = el.scrollHeight;
+    });
+}
+
+async function sendCmd() {
+    const input = document.getElementById('consoleInput');
+    const cmd = input.value.trim();
+    if (!cmd || !currentServerId) return;
+    await api(`/api/servers/${currentServerId}/command`, { method: 'POST', body: JSON.stringify({ command: cmd }) });
+    input.value = '';
+}
+
+async function serverAction(action) {
+    if (!currentServerId) return toast('ابتدا سرور را انتخاب کنید', 'warning');
+    await doServerAction(currentServerId, action);
+}
+
+// ── Players ────────────────────────────────────────────────
+function loadPlayers() {
+    const id = document.getElementById('playerServerSelect').value;
+    if (!id) return;
+    currentServerId = id;
+    socket.off('serverStatus:' + id);
+    socket.on('serverStatus:' + id, status => {
+        const el = document.getElementById('onlinePlayers');
+        if (status.players?.length) {
+            el.innerHTML = status.players.map(p => `<div style="padding:8px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between"><span>👤 ${escapeHtml(p)}</span><span class="badge badge-green">آنلاین</span></div>`).join('');
+        } else {
+            el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text2)">بازیکن آنلاین نیست</div>';
+        }
+    });
+    socket.emit('subscribeConsole', id);
+}
+
+async function playerAction(action) {
+    const serverId = document.getElementById('playerServerSelect').value;
+    const playerName = document.getElementById('playerName').value.trim();
+    if (!serverId) return toast('سرور انتخاب نشده', 'warning');
+
+    const body = { player: playerName };
+    if (action === 'ban-ip' || action === 'unban-ip') {
+        body.ip = document.getElementById('playerIP').value.trim();
+    }
+    if (!body.player && action !== 'ban-ip' && action !== 'unban-ip') return toast('نام بازیکن را وارد کنید', 'warning');
+
+    const res = await api(`/api/servers/${serverId}/players/${action}`, { method: 'POST', body: JSON.stringify(body) });
+    toast(res?.success ? 'انجام شد' : 'خطا', res?.success ? 'success' : 'error');
+}
+
+// ── File Manager ───────────────────────────────────────────
+async function loadFiles(dir) {
+    const serverId = document.getElementById('fileServerSelect').value;
+    if (!serverId) return;
+    currentServerId = serverId;
+    currentFilePath = dir;
+
+    const files = await api(`/api/servers/${serverId}/files?path=${encodeURIComponent(dir)}`) || [];
+    const el = document.getElementById('fileList');
+    const breadcrumb = document.getElementById('fileBreadcrumb');
+
+    // Breadcrumb
+    const parts = dir.split('/').filter(Boolean);
+    breadcrumb.innerHTML = `<span onclick="loadFiles('')">🏠 root</span>` +
+        parts.map((p, i) => `<span onclick="loadFiles('${parts.slice(0, i+1).join('/')}')">/ ${p}</span>`).join('');
+
+    // File list
+    el.innerHTML = files.map(f => {
+        const icon = f.isDir ? '📁' : getFileIcon(f.name);
+        const newPath = dir ? `${dir}/${f.name}` : f.name;
+        const actions = f.isDir
+            ? `<button class="btn btn-sm" onclick="loadFiles('${newPath}')">📂</button>`
+            : `<button class="btn btn-sm" onclick="editFile('${newPath}')">✏️</button>`;
+        return `<div class="file-item">
+            <span class="file-icon">${icon}</span>
+            <span class="file-name">${f.isDir ? '<strong>' : ''}${escapeHtml(f.name)}${f.isDir ? '</strong>' : ''}</span>
+            <span class="file-size">${f.isDir ? '-' : formatSize(f.size)}</span>
+            <span class="file-actions">
+                ${actions}
+                ${f.isDir ? '' : `<button class="btn btn-sm" onclick="downloadFile('${newPath}')">⬇️</button>`}
+                <button class="btn btn-sm" onclick="renameFile('${newPath}')">✏️</button>
+                <button class="btn btn-red btn-sm" onclick="deleteFile('${newPath}')">🗑️</button>
+            </span>
+        </div>`;
+    }).join('') || '<div style="padding:20px;text-align:center;color:var(--text2)">پوشه خالی است</div>';
+}
+
+function getFileIcon(name) {
+    const ext = name.split('.').pop().toLowerCase();
+    const icons = { jar:'☕', json:'📋', yml:'📋', yaml:'📋', txt:'📄', log:'📄', properties:'⚙️', zip:'📦', gz:'📦', png:'🖼️', jpg:'🖼️', gif:'🖼️' };
+    return icons[ext] || '📄';
+}
+
+async function editFile(filePath) {
+    const serverId = document.getElementById('fileServerSelect').value;
+    const data = await api(`/api/servers/${serverId}/files/read?path=${encodeURIComponent(filePath)}`);
+    if (data?.content !== undefined) {
+        editFilePath = filePath;
+        document.getElementById('editFileName').textContent = filePath;
+        document.getElementById('editFileContent').value = data.content;
+        showModal('editFile');
+    }
+}
+
+async function saveFileEdit() {
+    const serverId = document.getElementById('fileServerSelect').value;
+    const content = document.getElementById('editFileContent').value;
+    const res = await api(`/api/servers/${serverId}/files/write`, { method: 'POST', body: JSON.stringify({ path: editFilePath, content }) });
+    toast(res?.success ? 'ذخیره شد' : 'خطا', res?.success ? 'success' : 'error');
+    hideModals();
+    loadFiles(currentFilePath);
+}
+
+async function deleteFile(filePath) {
+    if (!confirm('آیا مطمئنید؟')) return;
+    const serverId = document.getElementById('fileServerSelect').value;
+    await api(`/api/servers/${serverId}/files/delete`, { method: 'POST', body: JSON.stringify({ path: filePath }) });
+    toast('حذف شد', 'success');
+    loadFiles(currentFilePath);
+}
+
+async function renameFile(filePath) {
+    const newName = prompt('نام جدید:', filePath.split('/').pop());
+    if (!newName) return;
+    const serverId = document.getElementById('fileServerSelect').value;
+    const dir = filePath.includes('/') ? filePath.substring(0, filePath.lastIndexOf('/')) : '';
+    const newPath = dir ? `${dir}/${newName}` : newName;
+    await api(`/api/servers/${serverId}/files/rename`, { method: 'POST', body: JSON.stringify({ oldPath: filePath, newPath }) });
+    toast('تغییر نام انجام شد', 'success');
+    loadFiles(currentFilePath);
+}
+
+function downloadFile(filePath) {
+    const serverId = document.getElementById('fileServerSelect').value;
+    window.open(`/api/servers/${serverId}/files/download?path=${encodeURIComponent(filePath)}`);
+}
+
+async function createNewFolder() {
+    const name = prompt('نام پوشه:');
+    if (!name) return;
+    const serverId = document.getElementById('fileServerSelect').value;
+    const fullPath = currentFilePath ? `${currentFilePath}/${name}` : name;
+    await api(`/api/servers/${serverId}/files/mkdir`, { method: 'POST', body: JSON.stringify({ path: fullPath }) });
+    toast('پوشه ساخته شد', 'success');
+    loadFiles(currentFilePath);
+}
+
+async function createNewFile() {
+    const name = prompt('نام فایل:');
+    if (!name) return;
+    const serverId = document.getElementById('fileServerSelect').value;
+    const fullPath = currentFilePath ? `${currentFilePath}/${name}` : name;
+    await api(`/api/servers/${serverId}/files/write`, { method: 'POST', body: JSON.stringify({ path: fullPath, content: '' }) });
+    toast('فایل ساخته شد', 'success');
+    loadFiles(currentFilePath);
+}
+
+async function doUploadFile() {
+    const serverId = document.getElementById('fileServerSelect').value;
+    const files = document.getElementById('fileUploadInput').files;
+    if (!files.length) return;
+    const formData = new FormData();
+    for (let f of files) formData.append('files', f);
+    formData.append('path', currentFilePath);
+    const res = await fetch(`/api/servers/${serverId}/files/upload`, { method: 'POST', headers: { 'Authorization': `Bearer ${token}` }, body: formData });
+    const data = await res.json();
+    toast(data?.success ? `${data.count} فایل آپلود شد` : 'خطا', data?.success ? 'success' : 'error');
+    hideModals();
+    loadFiles(currentFilePath);
+}
+
+// ── Install ────────────────────────────────────────────────
+async function installMinecraft() {
+    const serverId = document.getElementById('installServer').value;
+    const type = document.getElementById('installType').value;
+    const version = document.getElementById('installVersion').value;
+    if (!serverId) return toast('سرور انتخاب نشده', 'warning');
+
+    document.getElementById('installStatus').innerHTML = '<div style="color:var(--yellow)">⏳ در حال نصب...</div>';
+    const res = await api(`/api/servers/${serverId}/install`, { method: 'POST', body: JSON.stringify({ type, version }) });
+    if (res?.success) {
+        document.getElementById('installStatus').innerHTML = `<div style="color:var(--green)">✅ ${type} ${version} با موفقیت نصب شد!</div>`;
+        toast('نصب انجام شد!', 'success');
+    } else {
+        document.getElementById('installStatus').innerHTML = `<div style="color:var(--red)">❌ خطا: ${res?.error || 'Unknown'}</div>`;
+    }
+}
+
+// ── Plugins ────────────────────────────────────────────────
+async function loadPlugins() {
+    const serverId = document.getElementById('pluginServerSelect').value;
+    if (!serverId) return;
+    const files = await api(`/api/servers/${serverId}/files?path=plugins`) || [];
+    const el = document.getElementById('pluginList');
+    const jars = files.filter(f => f.name.endsWith('.jar'));
+    el.innerHTML = jars.length ? jars.map(f => `<div class="file-item">
+        <span class="file-icon">🔌</span>
+        <span class="file-name">${escapeHtml(f.name)}</span>
+        <span class="file-size">${formatSize(f.size)}</span>
+        <span class="file-actions">
+            <button class="btn btn-red btn-sm" onclick="deletePlugin('${f.name}')">🗑️</button>
+        </span>
+    </div>`).join('') : '<div style="padding:20px;text-align:center;color:var(--text2)">پلاگینی نصب نشده</div>';
+}
+
+async function uploadPlugin(input) {
+    const serverId = document.getElementById('pluginServerSelect').value;
+    if (!serverId || !input.files.length) return;
+    const formData = new FormData();
+    formData.append('files', input.files[0]);
+    formData.append('path', 'plugins');
+    await fetch(`/api/servers/${serverId}/files/upload`, { method: 'POST', headers: { 'Authorization': `Bearer ${token}` }, body: formData });
+    toast('پلاگین آپلود شد', 'success');
+    loadPlugins();
+}
+
+async function deletePlugin(name) {
+    if (!confirm('حذف شود؟')) return;
+    const serverId = document.getElementById('pluginServerSelect').value;
+    await api(`/api/servers/${serverId}/files/delete`, { method: 'POST', body: JSON.stringify({ path: `plugins/${name}` }) });
+    toast('حذف شد', 'success');
+    loadPlugins();
+}
+
+// ── Worlds ─────────────────────────────────────────────────
+async function loadWorlds() {
+    const serverId = document.getElementById('worldServerSelect').value;
+    if (!serverId) return;
+    const files = await api(`/api/servers/${serverId}/files?path=`) || [];
+    const el = document.getElementById('worldList');
+    const worlds = files.filter(f => f.isDir && !['plugins','logs','libraries','versions','crash-reports'].includes(f.name));
+    el.innerHTML = worlds.length ? worlds.map(f => `<div class="file-item">
+        <span class="file-icon">🌍</span>
+        <span class="file-name"><strong>${escapeHtml(f.name)}</strong></span>
+        <span class="file-actions">
+            <button class="btn btn-sm" onclick="downloadWorld('${f.name}')">⬇️</button>
+            <button class="btn btn-red btn-sm" onclick="deleteWorld('${f.name}')">🗑️</button>
+        </span>
+    </div>`).join('') : '<div style="padding:20px;text-align:center;color:var(--text2)">ورلدی یافت نشد</div>';
+}
+
+async function downloadWorld(name) {
+    const serverId = document.getElementById('worldServerSelect').value;
+    await api(`/api/servers/${serverId}/files/zip`, { method: 'POST', body: JSON.stringify({ path: name }) });
+    window.open(`/api/servers/${serverId}/files/download?path=${name}.zip`);
+}
+
+async function deleteWorld(name) {
+    if (!confirm('حذف شود؟')) return;
+    const serverId = document.getElementById('worldServerSelect').value;
+    await api(`/api/servers/${serverId}/files/delete`, { method: 'POST', body: JSON.stringify({ path: name }) });
+    toast('حذف شد', 'success');
+    loadWorlds();
+}
+
+async function uploadWorld(input) {
+    const serverId = document.getElementById('worldServerSelect').value;
+    if (!serverId || !input.files.length) return;
+    const formData = new FormData();
+    formData.append('files', input.files[0]);
+    formData.append('path', '');
+    await fetch(`/api/servers/${serverId}/files/upload`, { method: 'POST', headers: { 'Authorization': `Bearer ${token}` }, body: formData });
+    toast('ورلد آپلود شد', 'success');
+    loadWorlds();
+}
+
+// ── Backups ────────────────────────────────────────────────
+async function loadBackups() {
+    const serverId = document.getElementById('backupServerSelect').value;
+    if (!serverId) return;
+    const backups = await api(`/api/servers/${serverId}/backups`) || [];
+    const el = document.getElementById('backupList');
+    el.innerHTML = backups.length ? backups.map(b => `<div class="file-item">
+        <span class="file-icon">💾</span>
+        <span class="file-name">${escapeHtml(b.name)}</span>
+        <span class="file-size">${formatSize(b.size)}</span>
+        <span class="file-actions">
+            <button class="btn btn-sm" onclick="window.open('/api/backups/${b.id}/download')">⬇️</button>
+            <button class="btn btn-yellow btn-sm" onclick="restoreBackup('${b.id}')">♻️</button>
+            <button class="btn btn-red btn-sm" onclick="deleteBackup('${b.id}')">🗑️</button>
+        </span>
+    </div>`).join('') : '<div style="padding:20px;text-align:center;color:var(--text2)">بکاپی وجود ندارد</div>';
+}
+
+async function createBackup() {
+    const serverId = document.getElementById('backupServerSelect').value;
+    if (!serverId) return toast('سرور انتخاب نشده', 'warning');
+    toast('در حال ساخت بکاپ...', 'info');
+    const res = await api(`/api/servers/${serverId}/backup`, { method: 'POST' });
+    toast(res?.success ? 'بکاپ ساخته شد!' : 'خطا', res?.success ? 'success' : 'error');
+    loadBackups();
+}
+
+async function restoreBackup(id) {
+    if (!confirm('بازیابی بکاپ؟ فایل‌های فعلی جایگزین می‌شوند.')) return;
+    const res = await api(`/api/backups/${id}/restore`, { method: 'POST' });
+    toast(res?.success ? 'بازیابی شد' : 'خطا', res?.success ? 'success' : 'error');
+}
+
+async function deleteBackup(id) {
+    if (!confirm('حذف شود؟')) return;
+    await api(`/api/backups/${id}`, { method: 'DELETE' });
+    toast('حذف شد', 'success');
+    loadBackups();
+}
+
+// ── Schedules ──────────────────────────────────────────────
+async function loadSchedules() {
+    const serverId = document.getElementById('scheduleServerSelect').value;
+    if (!serverId) return;
+    const schedules = await api(`/api/servers/${serverId}/schedules`) || [];
+    const el = document.getElementById('scheduleList');
+    el.innerHTML = schedules.length ? schedules.map(s => `<div class="file-item">
+        <span class="file-icon">⏰</span>
+        <span class="file-name">${escapeHtml(s.name)} <span class="badge ${s.enabled?'badge-green':'badge-red'}">${s.enabled?'فعال':'غیرفعال'}</span></span>
+        <span class="file-size">${s.cron}</span>
+        <span class="file-actions">
+            <button class="btn btn-sm" onclick="toggleSchedule('${s.id}',${!s.enabled})">${s.enabled?'⏸️':'▶️'}</button>
+            <button class="btn btn-red btn-sm" onclick="deleteSchedule('${s.id}')">🗑️</button>
+        </span>
+    </div>`).join('') : '<div style="padding:20px;text-align:center;color:var(--text2)">تسکی ندارید</div>';
+}
+
+async function createSchedule() {
+    const serverId = document.getElementById('scheduleServerSelect').value;
+    const res = await api(`/api/servers/${serverId}/schedules`, { method: 'POST', body: JSON.stringify({
+        name: document.getElementById('schedName').value,
+        action: document.getElementById('schedAction').value,
+        cron: document.getElementById('schedCron').value,
+        command: document.getElementById('schedCommand').value
+    })});
+    toast(res?.success ? 'تسک ساخته شد' : 'خطا', res?.success ? 'success' : 'error');
+    hideModals();
+    loadSchedules();
+}
+
+async function toggleSchedule(id, enabled) {
+    await api(`/api/schedules/${id}`, { method: 'PUT', body: JSON.stringify({ enabled }) });
+    loadSchedules();
+}
+
+async function deleteSchedule(id) {
+    await api(`/api/schedules/${id}`, { method: 'DELETE' });
+    toast('حذف شد', 'success');
+    loadSchedules();
+}
+
+// ── Settings ───────────────────────────────────────────────
+async function loadSettings() {
+    const serverId = document.getElementById('settingsServerSelect').value;
+    if (!serverId) return;
+    currentServerId = serverId;
+    const props = await api(`/api/servers/${serverId}/properties`) || {};
+    const el = document.getElementById('settingsForm');
+    const important = ['server-port','motd','max-players','difficulty','gamemode','view-distance','simulation-distance','pvp','online-mode','white-list','spawn-protection','level-seed','level-type','allow-nether','allow-flight','spawn-npcs','spawn-animals','spawn-monsters','generate-structures','hardcore','enable-command-block'];
+    el.innerHTML = important.map(key => {
+        const val = props[key] || '';
+        return `<div class="form-group"><label>${key}</label><input class="form-input" data-prop="${key}" value="${escapeHtml(val)}"></div>`;
+    }).join('');
+
+    // Load server config
+    const srv = servers.find(s => s.id === serverId);
+    if (srv) {
+        document.getElementById('cfgName').value = srv.name || '';
+        document.getElementById('cfgPort').value = srv.port || 25565;
+        document.getElementById('cfgMaxRam').value = srv.maxRam || '2G';
+        document.getElementById('cfgMinRam').value = srv.minRam || '1G';
+        document.getElementById('cfgMaxPlayers').value = srv.maxPlayers || 20;
+        document.getElementById('cfgJavaPath').value = srv.javaPath || 'java';
+        document.getElementById('cfgJvmArgs').value = srv.jvmArgs || '';
+        document.getElementById('cfgAutoRestart').value = srv.autoRestart ? 'true' : 'false';
+    }
+}
+
+async function saveSettings() {
+    const serverId = document.getElementById('settingsServerSelect').value;
+    const props = {};
+    document.querySelectorAll('#settingsForm input[data-prop]').forEach(el => { props[el.dataset.prop] = el.value; });
+    const res = await api(`/api/servers/${serverId}/properties`, { method: 'PUT', body: JSON.stringify(props) });
+    toast(res?.success ? 'تنظیمات ذخیره شد' : 'خطا', res?.success ? 'success' : 'error');
+}
+
+async function saveServerConfig() {
+    const serverId = document.getElementById('settingsServerSelect').value;
+    const res = await api(`/api/servers/${serverId}`, { method: 'PUT', body: JSON.stringify({
+        name: document.getElementById('cfgName').value,
+        port: parseInt(document.getElementById('cfgPort').value),
+        maxRam: document.getElementById('cfgMaxRam').value,
+        minRam: document.getElementById('cfgMinRam').value,
+        maxPlayers: parseInt(document.getElementById('cfgMaxPlayers').value),
+        javaPath: document.getElementById('cfgJavaPath').value,
+        jvmArgs: document.getElementById('cfgJvmArgs').value,
+        autoRestart: document.getElementById('cfgAutoRestart').value === 'true'
+    })});
+    toast(res?.success ? 'ذخیره شد' : 'خطا', res?.success ? 'success' : 'error');
+    loadServers();
+}
+
+// ── Network ────────────────────────────────────────────────
+async function loadNetwork() {
+    const stats = await api('/api/system/stats') || {};
+    const el = document.getElementById('networkInfo');
+    const netEntries = Object.entries(stats.network || {});
+    el.innerHTML = `
+        <div class="stats-grid">
+            <div class="stat-card"><div class="icon">🌐</div><div class="value" style="font-size:16px">${netEntries.map(([k,v]) => `${k}: ${v}`).join('<br>') || 'N/A'}</div><div class="label">IP آدرس‌ها</div></div>
+            <div class="stat-card"><div class="icon">🖥️</div><div class="value" style="font-size:16px">${stats.hostname || 'N/A'}</div><div class="label">Hostname</div></div>
+        </div>
+        <div class="panel" style="margin-top:16px">
+            <h4>پورت‌های سرورها</h4>
+            <table>
+                <tr><th>سرور</th><th>پورت</th><th>وضعیت</th></tr>
+                ${servers.map(s => `<tr><td>${s.name}</td><td>${s.port||25565}</td><td><span class="badge ${s.status==='online'?'badge-green':'badge-red'}">${s.status||'offline'}</span></td></tr>`).join('')}
+            </table>
+        </div>`;
+}
+
+// ── Users ──────────────────────────────────────────────────
+async function loadUsers() {
+    const users = await api('/api/users') || [];
+    const el = document.getElementById('usersList');
+    el.innerHTML = `<table>
+        <tr><th>نام کاربری</th><th>ایمیل</th><th>نقش</th><th>تاریخ</th><th>عملیات</th></tr>
+        ${users.map(u => `<tr>
+            <td>${escapeHtml(u.username)}</td>
+            <td>${escapeHtml(u.email||'-')}</td>
+            <td><span class="badge ${u.role==='admin'?'badge-blue':'badge-green'}">${u.role}</span></td>
+            <td>${u.createdAt ? new Date(u.createdAt).toLocaleDateString('fa') : '-'}</td>
+            <td><button class="btn btn-red btn-sm" onclick="deleteUser('${u.id}')">🗑️</button></td>
+        </tr>`).join('')}
+    </table>`;
+}
+
+async function createUser() {
+    const res = await api('/api/auth/register', { method: 'POST', body: JSON.stringify({
+        username: document.getElementById('newUsername').value,
+        password: document.getElementById('newUserPass').value,
+        email: document.getElementById('newUserEmail').value,
+        role: document.getElementById('newUserRole').value
+    })});
+    toast(res?.success ? 'کاربر ساخته شد' : (res?.error || 'خطا'), res?.success ? 'success' : 'error');
+    hideModals();
+    loadUsers();
+}
+
+async function deleteUser(id) {
+    if (!confirm('حذف شود؟')) return;
+    await api(`/api/users/${id}`, { method: 'DELETE' });
+    toast('حذف شد', 'success');
+    loadUsers();
+}
+
+// ── System ─────────────────────────────────────────────────
+async function loadSystemPage() {
+    const stats = await api('/api/system/stats') || {};
+    document.getElementById('systemStats').innerHTML = `
+        <div class="stat-card"><div class="icon">💻</div><div class="value" style="font-size:16px">${stats.cpu?.model || 'N/A'}</div><div class="label">CPU (${stats.cpu?.cores} cores)</div></div>
+        <div class="stat-card"><div class="icon">💾</div><div class="value">${(stats.ram?.total/1073741824).toFixed(1)}GB</div><div class="label">RAM Total</div></div>
+        <div class="stat-card"><div class="icon">⏱️</div><div class="value">${formatUptime(stats.uptime||0)}</div><div class="label">آپتایم</div></div>
+        <div class="stat-card"><div class="icon">🖥️</div><div class="value" style="font-size:16px">${stats.platform} ${stats.hostname}</div><div class="label">سیستم‌عامل</div></div>
+    `;
+
+    const java = await api('/api/java/versions') || {};
+    document.getElementById('javaInfo').innerHTML = `<p>نسخه فعلی: <strong>${java.current || 'N/A'}</strong></p><p>نسخه‌های نصب شده: ${java.installed?.join(', ') || 'N/A'}</p>`;
+
+    const dbs = await api('/api/databases') || [];
+    document.getElementById('dbInfo').innerHTML = dbs.length ? `<table><tr><th>دیتابیس</th></tr>${dbs.map(d => `<tr><td>${d}</td></tr>`).join('')}</table>` : '<p>MySQL یافت نشد</p>';
+}
+
+// ── System Data ────────────────────────────────────────────
+async function loadSystemData() {
+    socket.emit('getStats');
+}
+
+// ── Theme ──────────────────────────────────────────────────
+function toggleTheme() {
+    document.body.classList.toggle('light');
+    localStorage.setItem('mc_theme', document.body.classList.contains('light') ? 'light' : 'dark');
+}
+
+// ── Modals ─────────────────────────────────────────────────
+function showModal(name) { document.getElementById('modal-' + name)?.classList.add('show'); }
+function hideModals() { document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('show')); }
+
+// ── Toast ──────────────────────────────────────────────────
+function toast(msg, type = 'info') {
+    const el = document.createElement('div');
+    el.className = `toast toast-${type}`;
+    el.innerHTML = `${type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'warning' ? '⚠️' : 'ℹ️'} ${msg}`;
+    document.getElementById('toasts').appendChild(el);
+    setTimeout(() => el.remove(), 4000);
+}
+
+// ── Helpers ────────────────────────────────────────────────
+function escapeHtml(s) { if (!s) return ''; const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+function formatSize(b) { if (b < 1024) return b + 'B'; if (b < 1048576) return (b/1024).toFixed(1) + 'KB'; if (b < 1073741824) return (b/1048576).toFixed(1) + 'MB'; return (b/1073741824).toFixed(1) + 'GB'; }
+
+// ── Auto Login ─────────────────────────────────────────────
+if (token) {
+    api('/api/auth/me').then(user => {
+        if (user?.id) {
+            currentUser = user;
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('app').style.display = 'block';
+            document.getElementById('currentUser').textContent = user.username;
+            initApp();
+        } else {
+            localStorage.removeItem('mc_token');
+            token = null;
+        }
+    });
+}
+
+// Restore theme
+if (localStorage.getItem('mc_theme') === 'light') document.body.classList.add('light');
+</script>
+</body>
+</html>
